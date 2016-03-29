@@ -1,7 +1,7 @@
 Rest.jl
 =============================================
 
-A easy way to build simple but extendable RESTful servers.
+An easy way to build simple but extendable RESTful servers.
 
 ### Installation
 
