@@ -3,7 +3,9 @@ module Rest
 using HttpServer
 using URIParser
 
-include("types.jl")
+include("RestMethod.jl")
+include("Resource.jl")
+include("route.jl")
 include("macros.jl")
 
 end # module Rest

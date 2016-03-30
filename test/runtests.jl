@@ -1,10 +1,9 @@
 using Rest
 using Base.Test
 
-todolist = Resource("todolist", "todo list")
-todoitem = Resource("todoitem", "todo item")
+todolist = Resource("todolist")
 
-@addmethod todolist, :GET, "get the list of todoitems", req -> begin
+addmethod(todolist, :GET) do req
     "hello world"
 end
 
