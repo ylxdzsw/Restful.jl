@@ -8,9 +8,3 @@ An easy way to build simple but extendable RESTful servers.
 ```julia
 Pkg.clone("git@github.com:ylxdzsw/Rest.jl.git","Rest")
 ```
-
-### Example
-
-### License
-
-MIT
