@@ -1,11 +1,11 @@
 using Rest
 using HttpServer
-using Requests
 using Base.Test
 
 import JSON
+import Requests: get, post, put, delete, options, readall, statuscode
 
-_TODOLIST = Dict{UInt64, UTF8String}()
+_TODOLIST = Dict()
 
 todolist = Resource("todolist")
 todoitem = Resource("todoitem", route="*")
@@ -18,13 +18,12 @@ end
 
 addmethod(todolist, :POST) do req, _
     content       = JSON.parse(req[:body]|>ASCIIString)["content"]
-    id            = hash(content)
+    id            = string(hash(content))
     _TODOLIST[id] = content
     Response(200, JSON.json(Dict(:id=>id)))
 end
 
 addmethod(todoitem, :GET) do req, id
-    id = parse(UInt64, id)
     if haskey(_TODOLIST, id)
         Response(200, JSON.json(Dict(:content=>_TODOLIST[id])))
     else
@@ -33,14 +32,12 @@ addmethod(todoitem, :GET) do req, id
 end
 
 addmethod(todoitem, :PUT) do req, id
-    id = parse(UInt64, id)
     content = JSON.parse(req[:body]|>ASCIIString)["content"]
     _TODOLIST[id] = content
     Response(200)
 end
 
 addmethod(todoitem, :DELETE) do req, id
-    id = parse(UInt64, id)
     if haskey(_TODOLIST, id)
         delete!(_TODOLIST, id)
         Response(200)
@@ -55,4 +52,14 @@ end
 
 @async run(Server(app), host=ip"127.0.0.1", port=8000)
 
-"All test cases pass (0/0)" |> println
+url(x) = "http://127.0.0.1:8000$x"
+
+@test readall(get(url("/"))) == "[]"
+@test statuscode(put(url("/10086"), json=Dict(:content=>"eat apple"))) == 200
+@test JSON.parse(readall(get(url("/10086"))))["content"] == "eat apple"
+@test readall(get(url("/"))) == "[\"10086\"]"
+@test statuscode(delete(url("/10086"))) == 200
+@test JSON.parse(readall(get(url("/10086"))))["error"] == "Not Found"
+@test readall(get(url("/"))) == "[]"
+@test JSON.parse(readall(post(url("/"), json=Dict(:content=>"drink water"))))["id"] ==
+      JSON.parse(readall(get(url("/"))))[1]
