@@ -1,3 +1,5 @@
+export RestMethod
+
 import Base.call
 
 type RestMethod

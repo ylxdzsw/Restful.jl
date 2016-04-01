@@ -1,3 +1,6 @@
+export Resource,
+       addmethod
+
 type Resource
     name::AbstractString
     route::Union{AbstractString, Function}
