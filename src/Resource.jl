@@ -1,5 +1,6 @@
 export Resource,
-       addmethod
+       addmethod,
+       addsubresource
 
 type Resource
     name::AbstractString
@@ -21,3 +22,5 @@ function addmethod(r::Resource, t::Symbol, d::AbstractString, f::Function)
     r.methods[t] = RestMethod(d, f)
 end
 addmethod(f::Function, r::Resource, t::Symbol, d::AbstractString="$t $r.name") = addmethod(r, t, d, f)
+
+addsubresource(r::Resource, s::Resource) = push!(r.subresources, s)
