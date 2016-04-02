@@ -1,6 +1,5 @@
 language: julia
 julia:
   - 0.4
-  - nightly
 script:
   - julia -e 'Pkg.clone(pwd()); Pkg.build("Rest"); Pkg.test("Rest", coverage=true)'
