@@ -8,9 +8,6 @@ import Requests: get, post, put, delete, options, readall, statuscode
 _TODOLIST = Dict()
 
 todolist = Resource("todolist")
-todoitem = Resource("todoitem", route="*")
-
-addsubresource(todolist, todoitem)
 
 addmethod(todolist, :GET) do req, _
     Response(200, JSON.json(collect(keys(_TODOLIST))))
@@ -23,26 +20,33 @@ addmethod(todolist, :POST) do req, _
     Response(200, JSON.json(Dict(:id=>id)))
 end
 
-addmethod(todoitem, :GET) do req, id
-    if haskey(_TODOLIST, id)
-        Response(200, JSON.json(Dict(:content=>_TODOLIST[id])))
-    else
-        Response(404, JSON.json(Dict(:error=>"Not Found")))
+@resource todoitem <: todolist begin
+    :name  => "todoitem"
+    :route => "*"
+
+    "get a todoitem content"
+    :GET => begin
+        if haskey(_TODOLIST, id)
+            Response(200, JSON.json(Dict(:content=>_TODOLIST[id])))
+        else
+            Response(404, JSON.json(Dict(:error=>"Not Found")))
+        end
     end
-end
 
-addmethod(todoitem, :PUT) do req, id
-    content = JSON.parse(req[:body]|>ASCIIString)["content"]
-    _TODOLIST[id] = content
-    Response(200)
-end
-
-addmethod(todoitem, :DELETE) do req, id
-    if haskey(_TODOLIST, id)
-        delete!(_TODOLIST, id)
+    "add a todoitem with specific id"
+    :PUT => begin
+        content = JSON.parse(req[:body]|>ASCIIString)["content"]
+        _TODOLIST[id] = content
         Response(200)
-    else
-        Response(404, JSON.json(Dict(:error=>"Not Found")))
+    end
+
+    :DELETE => begin
+        if haskey(_TODOLIST, id)
+            delete!(_TODOLIST, id)
+            Response(200)
+        else
+            Response(404, JSON.json(Dict(:error=>"Not Found")))
+        end
     end
 end
 
