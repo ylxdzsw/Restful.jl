@@ -5,12 +5,8 @@ function Base.call(r::Resource, req::Request)
 end
 
 function Base.call(r::Resource, req::Dict{Symbol, Any}, id::AbstractString="/")
-    if isempty(req[:path]) # leaf node
-        r.methods[req[:method]](req, id)
-    else
-        req[Symbol(r.name * "id")] = id
-        route(r.subresources, req, shift!(req[:path]))
-    end
+    res = callmethod(r, req, id)
+    makeresponse(r, res)
 end
 
 function route(candidates::Vector{Resource}, req, id)
@@ -19,8 +15,7 @@ function route(candidates::Vector{Resource}, req, id)
 
     i = findfirst(x->ismatch(x.route), candidates)
     if i == 0
-        #TODO 404
-        error("unimplemented")
+        404
     else
         candidates[i](req, id)
     end
@@ -38,3 +33,21 @@ function parserequest(req::Request)
 end
 
 splitpath(p::AbstractString) = split(p, '/', keep=false)
+
+function callmethod(r::Resource, req::Dict{Symbol, Any}, id::AbstractString)
+    if isempty(req[:path]) # leaf node
+        let r = r.methods, v = req[:method]
+            haskey(r, v) ? r[v](req, id) : 405
+        end
+    else
+        req[Symbol(r.name * "id")] = id
+        route(r.subresources, req, shift!(req[:path]))
+    end
+end
+
+function makeresponse(r::Resource, res::Response)
+    res.headers["Allow"] = join(keys(r.methods), ", ")
+    res
+end
+makeresponse(r::Resource, res) = makeresponse(r::Resource, Response(res))
+
