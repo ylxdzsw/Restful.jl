@@ -3,7 +3,8 @@ using HttpServer
 using Base.Test
 
 import JSON
-import Requests: get, post, put, delete, options, readall, statuscode
+import Requests: get, post, put, delete, options,
+                 readall, statuscode, headers
 
 _TODOLIST = Dict()
 
@@ -29,23 +30,22 @@ end
         if haskey(_TODOLIST, id)
             Response(200, JSON.json(Dict(:content=>_TODOLIST[id])))
         else
-            Response(404, JSON.json(Dict(:error=>"Not Found")))
+            404
         end
     end
 
     "add a todoitem with specific id"
     :PUT => begin
-        content = JSON.parse(req[:body]|>ASCIIString)["content"]
-        _TODOLIST[id] = content
-        Response(200)
+        _TODOLIST[id] = JSON.parse(req[:body]|>ASCIIString)["content"]
+        200
     end
 
     :DELETE => begin
         if haskey(_TODOLIST, id)
             delete!(_TODOLIST, id)
-            Response(200)
+            200
         else
-            Response(404, JSON.json(Dict(:error=>"Not Found")))
+            404
         end
     end
 end
@@ -63,7 +63,9 @@ url(x) = "http://127.0.0.1:8000$x"
 @test JSON.parse(readall(get(url("/10086"))))["content"] == "eat apple"
 @test readall(get(url("/"))) == "[\"10086\"]"
 @test statuscode(delete(url("/10086"))) == 200
-@test JSON.parse(readall(get(url("/10086"))))["error"] == "Not Found"
+@test statuscode(get(url("/10086"))) == 404
 @test readall(get(url("/"))) == "[]"
 @test JSON.parse(readall(post(url("/"), json=Dict(:content=>"drink water"))))["id"] ==
       JSON.parse(readall(get(url("/"))))[1]
+@test statuscode(put(url("/"))) == 405
+@test headers(put(url("/")))["Allow"] == "GET, POST"

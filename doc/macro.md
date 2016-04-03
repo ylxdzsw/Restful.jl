@@ -14,23 +14,22 @@ Here is an example:
         if haskey(_TODOLIST, id)
             Response(200, JSON.json(Dict(:content=>_TODOLIST[id])))
         else
-            Response(404, JSON.json(Dict(:error=>"Not Found")))
+            404
         end
     end
 
     "add a todoitem with specific id"
     :PUT => begin
-        content = JSON.parse(req[:body]|>ASCIIString)["content"]
-        _TODOLIST[id] = content
-        Response(200)
+        _TODOLIST[id] = JSON.parse(req[:body]|>ASCIIString)["content"]
+        200
     end
 
     :DELETE => begin
         if haskey(_TODOLIST, id)
             delete!(_TODOLIST, id)
-            Response(200)
+            200
         else
-            Response(404, JSON.json(Dict(:error=>"Not Found")))
+            404
         end
     end
 end
