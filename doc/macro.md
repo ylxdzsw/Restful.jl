@@ -1,6 +1,6 @@
 ### Macros
 
-Rest.jl provides `@resource` macro as a grammar suger.
+Restful.jl provides `@resource` macro as a grammar suger.
 
 Here is an example:
 

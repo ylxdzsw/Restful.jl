@@ -49,5 +49,5 @@ function makeresponse(r::Resource, res::Response)
     res.headers["Allow"] = join(keys(r.methods), ", ")
     res
 end
-makeresponse(r::Resource, res) = makeresponse(r::Resource, Response(res))
+makeresponse(r::Resource, res) = makeresponse(r, Response(res))
 

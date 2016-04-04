@@ -1,4 +1,4 @@
-module Rest
+module Restful
 
 using HttpServer
 using URIParser

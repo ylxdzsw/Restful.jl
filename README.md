@@ -1,14 +1,15 @@
-Rest.jl
+Restful.jl
 =============================================
 
-[![Build Status](https://travis-ci.org/ylxdzsw/Rest.jl.svg?branch=master)](https://travis-ci.org/ylxdzsw/Rest.jl)
+[![Build Status](https://travis-ci.org/ylxdzsw/Restful.jl.svg?branch=master)](https://travis-ci.org/ylxdzsw/Restful.jl)
+[![Documentation Status](https://readthedocs.org/projects/restfuljl/badge/?version=latest)](http://restfuljl.readthedocs.org/en/latest/?badge=latest)
 
 An easy way to build simple but extendable RESTful servers.
 
 ### Installation
 
 ```julia
-Pkg.clone("git@github.com:ylxdzsw/Rest.jl.git","Rest")
+Pkg.clone("git@github.com:ylxdzsw/Restful.jl.git","Restful")
 ```
 
 ### Example
@@ -73,4 +74,4 @@ end
 @async run(Server(app), host=ip"127.0.0.1", port=8000)
 ```
 
-_notice that a Resource is a function that turns a Request to a Response, so it is a valid [Mux.jl](https://github.com/JuliaWeb/Mux.jl) endpoint._
+_notice that a Resource is a function that turns a Request into a Response, so it is a valid [Mux.jl](https://github.com/JuliaWeb/Mux.jl) endpoint._

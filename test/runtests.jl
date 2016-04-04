@@ -1,4 +1,4 @@
-using Rest
+using Restful
 using HttpServer
 using Base.Test
 

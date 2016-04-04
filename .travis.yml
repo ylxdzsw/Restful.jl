@@ -2,4 +2,4 @@ language: julia
 julia:
   - 0.4
 script:
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("Rest"); Pkg.test("Rest", coverage=true)'
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("Restful"); Pkg.test("Restful", coverage=true)'
