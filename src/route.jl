@@ -1,12 +1,17 @@
 import Base.call
 
-function Base.call(r::Resource, req::Request)
-    req |> parserequest |> r
-end
+Base.call(r::Resource, req::Request) = req |> parserequest |> r
 
 function Base.call(r::Resource, req::Dict{Symbol, Any}, id::AbstractString="/")
-    res = callmethod(r, req, id)
-    makeresponse(r, res)
+    @callhook4(:preroute, r, req, id)
+    res = if isempty(req[:path]) # leaf node
+        raw = callmethod(r, req, id)
+        @callhook5(:onresponse, r, req, id, raw)
+    else
+        req[Symbol(r.name * "id")] = id
+        route(r.subresources, req, shift!(req[:path]))
+    end
+    @callhook5(:onreturn, r, req, id, res)
 end
 
 function route(candidates::Vector{Resource}, req, id)
@@ -35,13 +40,30 @@ end
 splitpath(p::AbstractString) = split(p, '/', keep=false)
 
 function callmethod(r::Resource, req::Dict{Symbol, Any}, id::AbstractString)
-    if isempty(req[:path]) # leaf node
-        let r = r.methods, v = req[:method]
-            haskey(r, v) ? r[v](req, id) : 405
+    let r = r.methods, v = req[:method]
+        haskey(r, v) ? r[v](req, id) : 405
+    end
+end
+
+macro callhook4(hook, r, req, id)
+    quote
+        for f! in $r.hooks[$hook]
+            result = f!($(esc(req)), $id)
+            if isa(result, Dict{Symbol, Any})
+                $(esc(req)) = result
+            elseif isa(result, Response)
+                return makeresponse($r, result)
+            end
         end
-    else
-        req[Symbol(r.name * "id")] = id
-        route(r.subresources, req, shift!(req[:path]))
+    end
+end
+
+macro callhook5(hook, r, req, id, res)
+    quote
+        for f! in $r.hooks[$hook]
+            $(esc(res)) = f!($req, $id, $(esc(res)))
+        end
+        $(esc(res))
     end
 end
 

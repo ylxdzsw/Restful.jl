@@ -31,7 +31,7 @@ where `id` is the segment that match the route rule of this resource, and `req` 
 - `:body`: the byte data of request.
 - `:path`: `Vector{SubString{AbstractString}}` contains url segments splited by '/'. Empty segments are not keeped.
 - `:query`: `Dict{ASCIIString,ASCIIString}` contains url queries.
-- `:Xid`: the id of one of ancestor resource X.
+- `:Xid`: the id of ancestor resource X.
 
 #### addsubresource(r::Resource, s::Resource)
 
