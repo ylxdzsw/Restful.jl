@@ -40,8 +40,11 @@ end
 splitpath(p::AbstractString) = split(p, '/', keep=false)
 
 function callmethod(r::Resource, req::Dict{Symbol, Any}, id::AbstractString)
-    let r = r.methods, v = req[:method]
-        haskey(r, v) ? r[v](req, id) : 405
+    let m = r.methods, v = req[:method],
+        h = [r.hooks[v]; (cb, req, id) -> haskey(m, v) ? m[v](req, id) : 405]
+        callone(i) = (req::Dict{Symbol, Any}, id::AbstractString) ->
+            h[i](callone(i+1), req, id)
+        callone(1)(req, id)
     end
 end
 
