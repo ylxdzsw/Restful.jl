@@ -8,13 +8,20 @@ import Requests: get, post, put, delete, options,
 
 _TODOLIST = Dict()
 
+makeresponse(r::Resource, req, id, res) = Response(res)
+json(next, r::Resource, req, id) = begin
+    req[:body] = JSON.parse(req[:body] |> ASCIIString)
+    res = next(req, id)
+    isa(res, Dict) ? JSON.json(res) : res
+end
+
 todolist = Resource("todolist")
 
-addmethod(todolist, :GET) do req, _
+addmethod!(todolist, :GET) do req, _
     Response(200, JSON.json(collect(keys(_TODOLIST))))
 end
 
-addmethod(todolist, :POST) do req, _
+addmethod!(todolist, :POST) do req, _
     content       = JSON.parse(req[:body]|>ASCIIString)["content"]
     id            = string(hash(content))
     _TODOLIST[id] = content
@@ -24,19 +31,20 @@ end
 @resource todoitem <: todolist begin
     :name  => "todoitem"
     :route => "*"
+    :onresponse => [makeresponse]
 
     "get a todoitem content"
-    :GET => begin
+    :GET | json => begin
         if haskey(_TODOLIST, id)
-            Response(200, JSON.json(Dict(:content=>_TODOLIST[id])))
+            Dict(:content=>_TODOLIST[id])
         else
             404
         end
     end
 
     "add a todoitem with specific id"
-    :PUT => begin
-        _TODOLIST[id] = JSON.parse(req[:body]|>ASCIIString)["content"]
+    :PUT | json => begin
+        _TODOLIST[id] = req[:body]["content"]
         200
     end
 
@@ -68,4 +76,4 @@ url(x) = "http://127.0.0.1:8000$x"
 @test JSON.parse(readall(post(url("/"), json=Dict(:content=>"drink water"))))["id"] ==
       JSON.parse(readall(get(url("/"))))[1]
 @test statuscode(put(url("/"))) == 405
-@test headers(put(url("/")))["Allow"] == "GET, POST"
+# @test headers(put(url("/")))["Allow"] == "GET, POST"

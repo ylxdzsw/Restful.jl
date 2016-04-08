@@ -1,11 +1,7 @@
 export Resource,
-       addmethod,
-       addsubresource,
-       hook
-
-const METHODS = Symbol[:GET, :POST, :PUT, :PATCH, :DELETE, :COPY, :HEAD, :OPTIONS, :LINK, :UNLINK, :PURGE, :LOCK, :UNLOCK, :PROPFIND, :VIEW]
-
-const HOOKS = Symbol[METHODS; :preroute; :onresponse; :onreturn]
+       addmethod!,
+       addsubresource!,
+       hook!
 
 type Resource
     name::AbstractString
@@ -22,14 +18,20 @@ type Resource
         new(name, route, methods, subresources, hooks)
 end
 
-function addmethod(r::Resource, t::Symbol, d::AbstractString, f::Function)
+function addmethod!(r::Resource, t::Symbol, d::AbstractString, f::Function)
     if t in keys(r.methods)
         warn("override $t method of $r.name")
     end
-    r.methods[t] = RestMethod(d, f)
+    if t in METHODS
+        r.methods[t] = RestMethod(d, f)
+    else
+        error("no method called $t")
+    end
 end
-addmethod(f::Function, r::Resource, t::Symbol, d::AbstractString="$t $r.name") = addmethod(r, t, d, f)
+addmethod!(f::Function, r::Resource, t::Symbol, d::AbstractString="$t $r.name") = addmethod!(r, t, d, f)
 
-addsubresource(r::Resource, s::Resource) = push!(r.subresources, s)
+addsubresource!(r::Resource, s::Resource) = push!(r.subresources, s)
+addsubresource!(r::Resource, s::Vector{Resource}) = for i in s addsubresource!(r, i) end
 
-hook(r::Resource, t::Symbol, f::Function) = t in HOOKS ? push!(r.hooks[t], f) : error("No hook called $t")
+hook!(r::Resource, t::Symbol, f::Function) = hook(r, t, Function[f])
+hook!(r::Resource, t::Symbol, f::Vector{Function}) = t in HOOKS ? for i in f push!(r.hooks[t], i) end : error("No hook called $t")

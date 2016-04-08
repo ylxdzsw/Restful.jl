@@ -1,5 +1,30 @@
 import Base.call
 
+macro callhook4(hook, r, req, id)
+    quote
+        for f! in $r.hooks[$hook]
+            result = f!($r, $(esc(req)), $id)
+            if isa(result, Dict{Symbol, Any})
+                $(esc(req)) = result
+            elseif isa(result, Response)
+                return result
+            end
+        end
+    end
+end
+
+macro callhook5(hook, r, req, id, res)
+    quote
+        for f! in $r.hooks[$hook]
+            result = f!($r, $req, $id, $(esc(res)))
+            if isa(result, Response)
+                $(esc(res)) = result
+            end
+        end
+        $(esc(res))
+    end
+end
+
 Base.call(r::Resource, req::Request) = req |> parserequest |> r
 
 function Base.call(r::Resource, req::Dict{Symbol, Any}, id::AbstractString="/")
@@ -20,7 +45,7 @@ function route(candidates::Vector{Resource}, req, id)
 
     i = findfirst(x->ismatch(x.route), candidates)
     if i == 0
-        404
+        Response(404)
     else
         candidates[i](req, id)
     end
@@ -41,38 +66,10 @@ splitpath(p::AbstractString) = split(p, '/', keep=false)
 
 function callmethod(r::Resource, req::Dict{Symbol, Any}, id::AbstractString)
     let m = r.methods, v = req[:method],
-        h = [r.hooks[v]; (cb, req, id) -> haskey(m, v) ? m[v](req, id) : 405]
+        h = [r.hooks[v]; (cb, r, req, id) -> haskey(m, v) ? m[v](req, id) : 405]
         callone(i) = (req::Dict{Symbol, Any}, id::AbstractString) ->
-            h[i](callone(i+1), req, id)
+            h[i](callone(i+1), r, req, id)
         callone(1)(req, id)
     end
 end
-
-macro callhook4(hook, r, req, id)
-    quote
-        for f! in $r.hooks[$hook]
-            result = f!($(esc(req)), $id)
-            if isa(result, Dict{Symbol, Any})
-                $(esc(req)) = result
-            elseif isa(result, Response)
-                return makeresponse($r, result)
-            end
-        end
-    end
-end
-
-macro callhook5(hook, r, req, id, res)
-    quote
-        for f! in $r.hooks[$hook]
-            $(esc(res)) = f!($req, $id, $(esc(res)))
-        end
-        $(esc(res))
-    end
-end
-
-function makeresponse(r::Resource, res::Response)
-    res.headers["Allow"] = join(keys(r.methods), ", ")
-    res
-end
-makeresponse(r::Resource, res) = makeresponse(r, Response(res))
 
