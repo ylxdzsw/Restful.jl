@@ -58,11 +58,7 @@ end
     end
 end
 
-app = HttpHandler() do req::Request, res::Response
-    todolist(req)
-end
-
-@async run(Server(app), host=ip"127.0.0.1", port=8000)
+@async run(Server(todolist), host=ip"127.0.0.1", port=8000)
 
 url(x) = "http://127.0.0.1:8000$x"
 

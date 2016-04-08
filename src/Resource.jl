@@ -35,3 +35,5 @@ addsubresource!(r::Resource, s::Vector{Resource}) = for i in s addsubresource!(r
 
 hook!(r::Resource, t::Symbol, f::Function) = hook(r, t, Function[f])
 hook!(r::Resource, t::Symbol, f::Vector{Function}) = t in HOOKS ? for i in f push!(r.hooks[t], i) end : error("No hook called $t")
+
+HttpServer.Server(r::Resource) = HttpHandler((req, _) -> r(req)) |> Server

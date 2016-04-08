@@ -9,7 +9,7 @@ An easy way to build simple but extendable RESTful servers.
 ### Installation
 
 ```julia
-Pkg.clone("git@github.com:ylxdzsw/Restful.jl.git","Restful")
+Pkg.add("Restful")
 ```
 
 ### Example
