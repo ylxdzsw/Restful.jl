@@ -9,8 +9,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   introduction
-   API
-   macro
-   route
+   sections/introduction
+   sections/API
+   sections/macro
+   sections/route
+   sections/hook
 

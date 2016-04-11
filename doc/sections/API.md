@@ -7,15 +7,20 @@ Resource has four properties:
 - route: route rule of this resource, see [route](route.html). default: name
 - methods: RestMethod that handles specific HTTP verb. default: RestMethod[]
 - subresources: resources that belongs to this one. deault: Resource[]
+- hooks: see [`hook`](hook.html)
 
 There are three ways to define a Resource:
 0. use the constructor. It is useful when you have methods and subresources defined already.
 0. make an empty Resource, then use [`addmethod`](#addmethod-r-resource-t-symbol-d-abstractstring-f-function) and [`addsubresource`](#addsubresource-r-resource-s-resource) to complete it.
-0. use the [`@resource`](macro.html) macro(recommended).
+0. *(recommended)* use the [`@resource`](macro.html) macro.
 
 #### RestMethod
 
 Simply a function with descriptions. You may not need to create it manually.
+
+#### Mixin
+
+a Mixin is a collection of hooks, created by [@mixin](macro.html). see [`hook`](hook.html)
 
 ### Functions
 
