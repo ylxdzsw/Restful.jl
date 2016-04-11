@@ -1,4 +1,4 @@
-export @resource
+export @resource, @mixin
 
 macro codegen(ex)
     :( push!(result.args, $(Expr(:quote, ex))) )
@@ -9,11 +9,11 @@ macro resource(declaration, content)
     if isa(declaration, Expr)
         this   = declaration.args[1]
         super  = declaration.args[3]
-        @codegen $this = Resource()
+        @codegen $this = Restful.Resource()
         @codegen addsubresource!($super, $this)
     elseif isa(declaration, Symbol)
         this = declaration
-        @codegen $declaration = Resource()
+        @codegen $declaration = Restful.Resource()
     else
         error("unexpected $(declaration)")
     end
@@ -41,6 +41,26 @@ macro resource(declaration, content)
                     @codegen addmethod!($this, $method, $description) do req, id $(i.args[2]) end
                     description = ""
                 end
+            end
+        else
+            error("unexpected $(i.head)")
+        end
+    end
+    esc(result)
+end
+
+macro mixin(this, content)
+    result = Expr(:block)
+    @codegen $this = Restful.Mixin()
+    for i in content.args
+        if i.head == :line
+            continue
+        elseif i.head == :(=>)
+            key = i.args[1].args[1]
+            if key in HOOKS
+                @codegen hook!($this, $(Expr(:quote, key)), $(i.args[2]))
+            else
+                error("no hooks called $key")
             end
         else
             error("unexpected $(i.head)")
