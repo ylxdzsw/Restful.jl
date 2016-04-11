@@ -8,7 +8,6 @@ import Requests: get, post, put, delete, options,
 
 _TODOLIST = Dict()
 
-makeresponse(r::Resource, req, id, res) = Response(res)
 json(next, r::Resource, req, id) = begin
     req[:body] = JSON.parse(req[:body] |> ASCIIString)
     res = next(req, id)
@@ -28,10 +27,12 @@ addmethod!(todolist, :POST) do req, _
     Response(200, JSON.json(Dict(:id=>id)))
 end
 
+addmixin!(todolist, defaultmixin)
+
 @resource todoitem <: todolist begin
     :name  => "todoitem"
     :route => "*"
-    :onresponse => [makeresponse]
+    :mixin => [defaultmixin]
 
     "get a todoitem content"
     :GET | json => begin

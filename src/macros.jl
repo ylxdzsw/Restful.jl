@@ -30,6 +30,8 @@ macro resource(declaration, content)
                 @codegen $(this).name = $(i.args[2])
             elseif key == :route
                 @codegen $(this).route = $(i.args[2])
+            elseif key == :mixin
+                @codegen addmixin!($this, $(i.args[2]))
             elseif key in setdiff(HOOKS, METHODS)
                 @codegen hook!($this, $(Expr(:quote, key)), $(i.args[2]))
             else
