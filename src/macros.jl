@@ -10,7 +10,7 @@ macro resource(declaration, content)
         this   = declaration.args[1]
         super  = declaration.args[3]
         @codegen $this = Restful.Resource()
-        @codegen addsubresource!($super, $this)
+        @codegen Restful.addsubresource!($super, $this)
     elseif isa(declaration, Symbol)
         this = declaration
         @codegen $declaration = Restful.Resource()
@@ -31,16 +31,16 @@ macro resource(declaration, content)
             elseif key == :route
                 @codegen $(this).route = $(i.args[2])
             elseif key == :mixin
-                @codegen addmixin!($this, $(i.args[2]))
+                @codegen Restful.addmixin!($this, $(i.args[2]))
             elseif key in setdiff(HOOKS, METHODS)
-                @codegen hook!($this, $(Expr(:quote, key)), $(i.args[2]))
+                @codegen Restful.hook!($this, $(Expr(:quote, key)), $(i.args[2]))
             else
                 (hooks, method) = parsepipe(i.args[1])
-                @codegen hook!($this, $method, $(Expr(:ref, :Function, hooks...)))
+                @codegen Restful.hook!($this, $method, $(Expr(:ref, :Function, hooks...)))
                 if description==""
-                    @codegen addmethod!($this, $method) do req, id $(i.args[2]) end
+                    @codegen Restful.addmethod!($this, $method) do req, id $(i.args[2]) end
                 else
-                    @codegen addmethod!($this, $method, $description) do req, id $(i.args[2]) end
+                    @codegen Restful.addmethod!($this, $method, $description) do req, id $(i.args[2]) end
                     description = ""
                 end
             end
@@ -60,7 +60,7 @@ macro mixin(this, content)
         elseif i.head == :(=>)
             key = i.args[1].args[1]
             if key in HOOKS
-                @codegen hook!($this, $(Expr(:quote, key)), $(i.args[2]))
+                @codegen Restful.hook!($this, $(Expr(:quote, key)), $(i.args[2]))
             else
                 error("no hooks called $key")
             end

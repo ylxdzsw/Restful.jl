@@ -11,23 +11,23 @@ _TODOLIST = Dict()
 json(next, r::Resource, req, id) = begin
     req[:body] = JSON.parse(req[:body] |> ASCIIString)
     res = next(req, id)
-    isa(res, Dict) ? JSON.json(res) : res
+    isa(res, Union{Dict, Vector}) ? JSON.json(res) : res
 end
 
-todolist = Resource("todolist")
+@resource todolist begin
+    :name => "todolist"
+    :mixin => [defaultmixin]
 
-addmethod!(todolist, :GET) do req, _
-    Response(200, JSON.json(collect(keys(_TODOLIST))))
+    :GET | json => begin
+        _TODOLIST |> keys |> collect
+    end
+
+    :POST | json => begin
+        id = req[:body] |> hash |> string
+        _TODOLIST[id] = req[:body]
+        Dict(:id=>id)
+    end
 end
-
-addmethod!(todolist, :POST) do req, _
-    content       = JSON.parse(req[:body]|>ASCIIString)["content"]
-    id            = string(hash(content))
-    _TODOLIST[id] = content
-    Response(200, JSON.json(Dict(:id=>id)))
-end
-
-addmixin!(todolist, defaultmixin)
 
 @resource todoitem <: todolist begin
     :name  => "todoitem"
@@ -73,4 +73,4 @@ url(x) = "http://127.0.0.1:8000$x"
 @test JSON.parse(readall(post(url("/"), json=Dict(:content=>"drink water"))))["id"] ==
       JSON.parse(readall(get(url("/"))))[1]
 @test statuscode(put(url("/"))) == 405
-# @test headers(put(url("/")))["Allow"] == "GET, POST"
+@test headers(put(url("/")))["Allow"] == "GET, POST"

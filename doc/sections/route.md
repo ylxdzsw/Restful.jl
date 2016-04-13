@@ -6,7 +6,7 @@ root and be passed through subresources until reaching the end.
 Valid route rules are either a ASCIIString or a Function that accepts a string and
 returns a Bool. "*" will match any strings.
 
-For example, there is a few teams, each team has a leader, some members
+For example, there are a few teams, each team has a leader, some members
 (member ids are 4 letter long) and some projects(project ids are 6 letter long).
 A tree structure can be like this:
 
