@@ -9,11 +9,11 @@ macro resource(declaration, content)
     if isa(declaration, Expr)
         this   = declaration.args[1]
         super  = declaration.args[3]
-        @codegen $this = Restful.Resource()
+        @codegen $this = Restful.Resource($(string(this)))
         @codegen Restful.addsubresource!($super, $this)
     elseif isa(declaration, Symbol)
         this = declaration
-        @codegen $declaration = Restful.Resource()
+        @codegen $this = Restful.Resource($(string(this)))
     else
         error("unexpected $(declaration)")
     end
