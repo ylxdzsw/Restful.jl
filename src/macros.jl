@@ -18,8 +18,16 @@ macro resource(declaration, content)
         error("unexpected $(declaration)")
     end
 
+    definations = if content.head == :let
+        content.args[1].args
+    elseif content.head == :block
+        content.args
+    else
+        error("unrecognized content type")
+    end
+
     local description = ""
-    for i in content.args
+    for i in definations
         if isa(i, AbstractString)
             description = i
         elseif i.head == :line
