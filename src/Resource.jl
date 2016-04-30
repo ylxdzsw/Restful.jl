@@ -6,13 +6,13 @@ export Resource,
 
 type Resource
     name::AbstractString
-    route::Union{AbstractString, Function}
+    route::Union{AbstractString, Function, Regex}
     methods::Dict{Symbol, RestMethod}
     subresources::Vector{Resource}
     hooks::Dict{Symbol, Vector{Function}}
 
     Resource(name::AbstractString = "";
-             route::Union{AbstractString, Function} = name,
+             route::Union{AbstractString, Function, Regex} = name,
              methods::Dict{Symbol, RestMethod} = Dict{Symbol, RestMethod}(),
              subresources::Vector{Resource} = Resource[],
              hooks::Dict{Symbol, Vector{Function}} = [i => Function[] for i in HOOKS]) =

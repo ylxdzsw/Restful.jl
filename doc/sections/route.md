@@ -4,7 +4,7 @@ In Restful.jl, resources are structured as a tree. A Request starts from the
 root and be passed through subresources until reaching the end.
 
 Valid route rules are either a ASCIIString or a Function that accepts a string and
-returns a Bool. "*" will match any strings.
+returns a Bool. "*" will match any strings. Since v0.2.0, `Regex` is also supported.
 
 For example, there are a few teams, each team has a leader, some members
 (member ids are 4 letter long) and some projects(project ids are 6 letter long).

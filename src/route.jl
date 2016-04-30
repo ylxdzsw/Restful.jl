@@ -42,6 +42,7 @@ end
 function route(candidates::Vector{Resource}, req, id)
     ismatch(p::AbstractString) = p == "*" || p == id
     ismatch(p::Function) = p(id)
+    ismatch(p::Regex) = Base.ismatch(p, id)
 
     i = findfirst(x->ismatch(x.route), candidates)
     if i == 0
