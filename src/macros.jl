@@ -40,6 +40,8 @@ macro resource(declaration, content)
                 @codegen $(this).route = $(i.args[2])
             elseif key == :mixin
                 @codegen Restful.addmixin!($this, $(i.args[2]))
+            elseif key == :children || key == :subresources
+                @codegen Restful.addsubresource!($this, $(i.args[2]))
             elseif key in setdiff(HOOKS, METHODS)
                 @codegen Restful.hook!($this, $(Expr(:quote, key)), $(i.args[2]))
             else
