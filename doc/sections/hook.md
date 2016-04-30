@@ -2,17 +2,20 @@
 
 Hooks are functions that triggers at specific times. Currently there are three types of hooks:
 
-#### preroute
+#### onroute & onhandle
 
 `(r::Resource, req::Dict{Symbol, Any}, id::AbstractString) -> Any`
 
 Triggered before a request handled by this resource or passed to a child resource.
 
-It returns a `Dict{Symbol, Any}` to replace `req` for the following handlers,
+`onroute` returns a `Dict{Symbol, Any}` to replace `req` for the following handlers,
 or returns a `Response` to end this request and respond. When it returns other
 things, the returned value will be ignored. However, modifications to `req` works.
 
-#### onresponse & onretrun
+`onhandle` is like `onroute` but triggerd only when a request is about to be handled
+by this vary resource.
+
+#### onresponse & onreturn
 
 `(r::Resource, req::Dict{Symbol, Any}, id::AbstractString, res::Response(Any)) -> Response(Any)`
 
@@ -31,6 +34,10 @@ Triggered before a request handled by this resource. You can alter `req` and cal
 then alter the response that `next` returns. You can also make a response without calling
 `next` if you like. Doing this cause the request end before handled by the resource and
 follwing hooks.
+
+#### flow
+
+![digraph of hooks](../graphs/hooks.png)
 
 ### Mixin
 

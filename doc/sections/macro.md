@@ -49,7 +49,7 @@ timestart(r, req, id) = req["request time"] = now()
 timeend(r, req, id, res) = now() - req["request time"] |> println
 
 @mixin timer begin
-    :preroute => [timestart]
+    :onroute  => [timestart]
     :onreturn => [timeend]
 end
 ```

@@ -1,0 +1,33 @@
+digraph hooks {
+    node [fontsize=14 fontname="Consolas"]
+    edge [fontsize=14 fontname="Consolas"]
+
+    request     [label="a new request"]
+    onroute     [label="onroute hook"]
+    subresource [label="passing to subresource"]
+    onhandle    [label="onhandle hook"]
+    onverb1     [label="method hook 1"]
+    onverb2     [label="method hook 2"]
+    onverb3     [label="..."]
+    method      [label="resource method"]
+    onresponse  [label="onresponse hook"]
+    onreturn    [label="onreturn hook"]
+    response    [label="the response"]
+
+    request     -> onroute
+    onroute     -> response    [label="returns a Response"]
+    onroute     -> subresource
+    onroute     -> onhandle
+    onhandle    -> response    [label="returns a Response"]
+    onhandle    -> onverb1
+    onverb1     -> onverb2     [label="call next"]
+    onverb1     -> onresponse
+    onverb2     -> onverb3     [label="call next"]
+    onverb2     -> onverb1
+    onverb3     -> method      [label="call next"]
+    onverb3     -> onverb2
+    method      -> onverb3
+    onresponse  -> onreturn
+    subresource -> onreturn
+    onreturn    -> response
+}
