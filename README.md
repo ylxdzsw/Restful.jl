@@ -17,14 +17,7 @@ Pkg.add("Restful")
 ```julia
 _TODOLIST = Dict()
 
-json(next, r::Resource, req, id) = begin
-    req[:body] = JSON.parse(req[:body] |> ASCIIString)
-    res = next(req, id)
-    isa(res, Union{Dict, Vector}) ? JSON.json(res) : res
-end
-
 @resource todolist begin
-    :name => "todolist"
     :mixin => [defaultmixin]
 
     :GET | json => begin
@@ -39,7 +32,6 @@ end
 end
 
 @resource todoitem <: todolist begin
-    :name  => "todoitem"
     :route => "*"
     :mixin => [defaultmixin]
 
