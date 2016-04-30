@@ -28,8 +28,9 @@ end
 Base.call(r::Resource, req::Request) = req |> parserequest |> r
 
 function Base.call(r::Resource, req::Dict{Symbol, Any}, id::AbstractString="/")
-    @callhook4(:preroute, r, req, id)
+    @callhook4(:onroute, r, req, id)
     res = if isempty(req[:path]) # leaf node
+        @callhook4(:onhandle, r, req, id)
         raw = callmethod(r, req, id)
         @callhook5(:onresponse, r, req, id, raw)
     else
