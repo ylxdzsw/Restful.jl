@@ -71,3 +71,32 @@ staticserver(dir::AbstractString="."; cache::Int=0) =
         res.headers["Last-Modified"] = Dates.format(mt, Dates.RFC1123Format)
         res
     end
+
+module JLT
+    cache = Dict{AbstractString, Function}
+
+    "template string -> function that turns "
+    function compile(x::AbstractString)
+        raw = split(x, "\$\$")
+        buf = IOBuffer(length(x.data) + length(raw)*32)
+        iscode = false # indicating if i is code
+        for i in raw
+            if iscode
+                write(buf, ' ', i, ' ')
+            else
+                write(buf, "write(JLT_output, \"\"\"", i, "\"\"\"")
+            end
+
+            code = !code
+        end
+    end
+
+    "Filepath -> AbstractString"
+    function render(file::AbstractString; kwargs...)
+
+    end
+
+    function render_cached(file::AbstractString; kwargs...)
+
+    end
+end
