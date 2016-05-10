@@ -1,7 +1,9 @@
+import Base.Meta: quot
+
 export @resource, @mixin
 
 macro codegen(ex)
-    :( push!(result.args, $(Expr(:quote, ex))) )
+    :( push!(result.args, $(quot(ex))) )
 end
 
 macro resource(declaration, content)
@@ -43,7 +45,7 @@ macro resource(declaration, content)
             elseif key == :children || key == :subresources
                 @codegen Restful.addsubresource!($this, $(i.args[2]))
             elseif key in setdiff(HOOKS, METHODS)
-                @codegen Restful.hook!($this, $(Expr(:quote, key)), $(i.args[2]))
+                @codegen Restful.hook!($this, $(quot(key)), $(i.args[2]))
             else
                 (hooks, method) = parsepipe(i.args[1])
                 @codegen Restful.hook!($this, $method, $(Expr(:ref, :Function, hooks...)))
@@ -70,7 +72,7 @@ macro mixin(this, content)
         elseif i.head == :(=>)
             key = i.args[1].args[1]
             if key in HOOKS
-                @codegen Restful.hook!($this, $(Expr(:quote, key)), $(i.args[2]))
+                @codegen Restful.hook!($this, $(quot(key)), $(i.args[2]))
             else
                 error("no hooks called $key")
             end
