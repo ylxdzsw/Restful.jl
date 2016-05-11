@@ -9,6 +9,10 @@ include("Resource.jl")
 include("Mixin.jl")
 include("route.jl")
 include("macros.jl")
-include("utils.jl")
 
-end # module Rest
+include("utils/hooks.jl")
+include("utils/JLT.jl")
+include("utils/mixins.jl")
+include("utils/staticserver.jl")
+
+end # module Restful
