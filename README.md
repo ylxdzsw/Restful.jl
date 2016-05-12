@@ -3,6 +3,7 @@ Restful.jl
 
 [![Build Status](https://travis-ci.org/ylxdzsw/Restful.jl.svg?branch=master)](https://travis-ci.org/ylxdzsw/Restful.jl)
 [![Documentation Status](https://readthedocs.org/projects/restfuljl/badge/?version=latest)](http://restfuljl.readthedocs.org/en/latest/?badge=latest)
+[![Coverage Status](https://coveralls.io/repos/github/ylxdzsw/Restful.jl/badge.svg?branch=master)](https://coveralls.io/github/ylxdzsw/Restful.jl?branch=master)
 
 An easy way to build simple but extendable RESTful servers.
 
