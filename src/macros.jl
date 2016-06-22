@@ -88,7 +88,7 @@ function parsepipe(x::Expr)
         (hooks, method) = parsepipe(x.args[2])
         (push!(hooks, x.args[3]), method)
     elseif x.head == :quote
-        (Symbol[], x)
+        (Union{Symbol, Expr}[], x)
     else
         error("unexpected $x")
     end
