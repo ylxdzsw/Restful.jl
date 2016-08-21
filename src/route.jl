@@ -1,5 +1,3 @@
-import Base.call
-
 macro callhook4(hook, r, req, id)
     quote
         for f! in $r.hooks[$hook]
@@ -25,9 +23,9 @@ macro callhook5(hook, r, req, id, res)
     end
 end
 
-Base.call(r::Resource, req::Request) = req |> parserequest |> r
+(r::Resource)(req::Request) = req |> parserequest |> r
 
-function Base.call(r::Resource, req::Dict{Symbol, Any}, id::AbstractString="/")
+function (r::Resource)(req::Dict{Symbol, Any}, id::AbstractString="/")
     @callhook4(:onroute, r, req, id)
     res = if isempty(req[:path]) # leaf node
         @callhook4(:onhandle, r, req, id)
@@ -74,4 +72,3 @@ function callmethod(r::Resource, req::Dict{Symbol, Any}, id::AbstractString)
         callone(1)(req, id)
     end
 end
-

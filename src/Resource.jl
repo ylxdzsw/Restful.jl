@@ -15,7 +15,7 @@ type Resource
              route::Union{AbstractString, Function, Regex} = name,
              methods::Dict{Symbol, RestMethod} = Dict{Symbol, RestMethod}(),
              subresources::Vector{Resource} = Resource[],
-             hooks::Dict{Symbol, Vector{Function}} = [i => Function[] for i in HOOKS]) =
+             hooks::Dict{Symbol, Vector{Function}} = Dict(i => Function[] for i in HOOKS)) =
         new(name, route, methods, subresources, hooks)
 end
 

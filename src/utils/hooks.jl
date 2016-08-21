@@ -2,7 +2,7 @@ import JSON
 
 json(next, r::Resource, req, id) = begin
     try
-        req[:body] = JSON.parse(req[:body] |> UTF8String)
+        req[:body] = JSON.parse(req[:body] |> String)
     end
     res = next(req, id)
     isa(res, Union{Dict, Vector}) || return res

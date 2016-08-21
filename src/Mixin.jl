@@ -3,7 +3,7 @@ export hook!, addmixin!
 type Mixin
     hooks::Dict{Symbol, Vector{Function}}
 
-    Mixin() = new([i => Function[] for i in HOOKS])
+    Mixin() = new(Dict(i => Function[] for i in HOOKS))
 end
 
 hook!(m::Mixin, t::Symbol, f::Function) = hook!(m, t, Function[f])

@@ -1,6 +1,6 @@
 language: julia
 julia:
-  - 0.4
+  - 0.5
 script:
   - julia -e 'Pkg.clone(pwd()); Pkg.build("Restful"); Pkg.test("Restful", coverage=true)'
 after_success:

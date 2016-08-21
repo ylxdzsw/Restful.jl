@@ -8,9 +8,8 @@ end
 
 macro resource(declaration, content)
     result = Expr(:block)
-    if isa(declaration, Expr)
-        this   = declaration.args[1]
-        super  = declaration.args[3]
+    if isa(declaration, Expr) && declaration.head == :<:
+        this, super = declaration.args
         @codegen $this = Restful.Resource($(string(this)))
         @codegen Restful.addsubresource!($super, $this)
     elseif isa(declaration, Symbol)
@@ -30,7 +29,7 @@ macro resource(declaration, content)
 
     local description = ""
     for i in definations
-        if isa(i, AbstractString)
+        if isa(i, AbstractString) && isempty(description)
             description = i
         elseif i.head == :line
             continue
@@ -42,7 +41,7 @@ macro resource(declaration, content)
                 @codegen $(this).route = $(i.args[2])
             elseif key == :mixin
                 @codegen Restful.addmixin!($this, $(i.args[2]))
-            elseif key == :children || key == :subresources
+            elseif key in (:children, :subresources)
                 @codegen Restful.addsubresource!($this, $(i.args[2]))
             elseif key in setdiff(HOOKS, METHODS)
                 @codegen Restful.hook!($this, $(quot(key)), $(i.args[2]))
