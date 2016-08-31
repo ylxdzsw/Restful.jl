@@ -11,8 +11,8 @@ include("route.jl")
 include("macros.jl")
 
 include("utils/hooks.jl")
-include("utils/JLT.jl")
 include("utils/mixins.jl")
 include("utils/staticserver.jl")
+include("utils/template.jl")
 
 end # module Restful
