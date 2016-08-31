@@ -16,7 +16,7 @@ staticserver(dir::AbstractString="."; cache::Int=0) =
             end
         end
 
-        res = open(readbytes, filepath) |> Response
+        res = open(read, filepath) |> Response
         res.headers["Content-Type"] = get(HttpServer.mimetypes, ext, "application/octet-stream") # text/plain should be better?
         res.headers["Last-Modified"] = Dates.format(mt, Dates.RFC1123Format)
         res
