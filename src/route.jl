@@ -1,9 +1,10 @@
 macro callhook4(hook, r, req, id)
+    r, req, id = map(esc, (r, req, id))
     quote
         for f! in $r.hooks[$hook]
-            result = f!($r, $(esc(req)), $id)
+            result = f!($r, $req, $id)
             if isa(result, Dict{Symbol, Any})
-                $(esc(req)) = result
+                $req = result
             elseif isa(result, Response)
                 return result
             end
@@ -12,14 +13,15 @@ macro callhook4(hook, r, req, id)
 end
 
 macro callhook5(hook, r, req, id, res)
+    r, req, id, res = map(esc, (r, req, id, res))
     quote
         for f! in $r.hooks[$hook]
-            result = f!($r, $req, $id, $(esc(res)))
+            result = f!($r, $req, $id, $res)
             if isa(result, Response)
-                $(esc(res)) = result
+                $res = result
             end
         end
-        $(esc(res))
+        $res
     end
 end
 

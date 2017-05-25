@@ -3,8 +3,7 @@ using HttpServer
 using Base.Test
 
 import JSON
-import Requests: get, post, put, delete, options,
-                 readall, statuscode, headers
+import Requests: get, post, put, delete, options, statuscode, headers
 import Restful.json
 
 _TODOLIST = Dict()
@@ -56,14 +55,14 @@ end
 
 url(x) = "http://127.0.0.1:8000$x"
 
-@test readall(get(url("/"))) == "[]"
+@test readstring(get(url("/"))) == "[]"
 @test statuscode(put(url("/10086"), json=Dict(:content=>"eat apple"))) == 200
-@test JSON.parse(readall(get(url("/10086"))))["content"] == "eat apple"
-@test readall(get(url("/"))) == "[\"10086\"]"
+@test JSON.parse(readstring(get(url("/10086"))))["content"] == "eat apple"
+@test readstring(get(url("/"))) == "[\"10086\"]"
 @test statuscode(delete(url("/10086"))) == 200
 @test statuscode(get(url("/10086"))) == 404
-@test readall(get(url("/"))) == "[]"
-@test JSON.parse(readall(post(url("/"), json=Dict(:content=>"drink water"))))["id"] ==
-      JSON.parse(readall(get(url("/"))))[1]
+@test readstring(get(url("/"))) == "[]"
+@test JSON.parse(readstring(post(url("/"), json=Dict(:content=>"drink water"))))["id"] ==
+      JSON.parse(readstring(get(url("/"))))[1]
 @test statuscode(put(url("/"))) == 405
 @test headers(put(url("/")))["Allow"] == "GET, POST"
