@@ -35,7 +35,7 @@ function (r::Resource)(req::Dict{Symbol, Any}, id::AbstractString="/")
         @callhook5(:onresponse, r, req, id, raw)
     else
         req[Symbol(r.name * "id")] = id
-        route(r.subresources, req, shift!(req[:path]))
+        route(r.subresources, req, popfirst!(req[:path]))
     end
     @callhook5(:onreturn, r, req, id, res)
 end
@@ -64,7 +64,7 @@ function parserequest(req::Request)
     )
 end
 
-splitpath(p::AbstractString) = split(p, '/', keep=false)
+splitpath(p::AbstractString) = split(p, '/', keepempty=false)
 
 function callmethod(r::Resource, req::Dict{Symbol, Any}, id::AbstractString)
     let m = r.methods, v = req[:method],

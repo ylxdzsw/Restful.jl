@@ -4,7 +4,7 @@ export Resource,
        hook!,
        help
 
-type Resource
+mutable struct Resource
     name::AbstractString
     route::Union{AbstractString, Function, Regex}
     methods::Dict{Symbol, RestMethod}

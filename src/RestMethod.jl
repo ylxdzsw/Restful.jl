@@ -1,6 +1,6 @@
 export RestMethod
 
-type RestMethod
+mutable struct RestMethod
     description::AbstractString
     f::Function
 end

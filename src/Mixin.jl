@@ -1,6 +1,6 @@
 export hook!, addmixin!
 
-type Mixin
+mutable struct Mixin
     hooks::Dict{Symbol, Vector{Function}}
 
     Mixin() = new(Dict(i => Function[] for i in HOOKS))

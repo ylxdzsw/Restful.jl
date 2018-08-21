@@ -13,6 +13,7 @@ staticserver(dir::AbstractString="."; cache::Int=0) =
                 if mt <= DateTime(req[:headers]["If-Modified-Since"], Dates.RFC1123Format)
                     return Response(304)
                 end
+            catch
             end
         end
 
