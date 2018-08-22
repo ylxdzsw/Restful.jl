@@ -63,5 +63,3 @@ end
 
 @async run(Server(todolist), host=ip"127.0.0.1", port=8000)
 ```
-
-_notice that a Resource is a function that turns a Request into a Response, so it is a valid [Mux.jl](https://github.com/JuliaWeb/Mux.jl) endpoint._

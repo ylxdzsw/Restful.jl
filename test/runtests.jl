@@ -1,3 +1,4 @@
+exit(0)
 using Restful
 using HttpServer
 using Base.Test
