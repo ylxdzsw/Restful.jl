@@ -1,18 +1,21 @@
 module Restful
+    using HTTP
 
-using HttpServer
-using URIParser
+    export Utils
 
-include("constants.jl")
-include("RestMethod.jl")
-include("Resource.jl")
-include("Mixin.jl")
-include("route.jl")
-include("macros.jl")
+    include("constants.jl")
+    include("RestMethod.jl")
+    include("Resource.jl")
+    include("Mixin.jl")
+    include("route.jl")
+    include("macros.jl")
 
-include("utils/hooks.jl")
-include("utils/mixins.jl")
-include("utils/staticserver.jl")
-include("utils/template.jl")
+    module Utils
+        using ..Restful
 
-end # module Restful
+        include("utils/hooks.jl")
+        include("utils/mixins.jl")
+        include("utils/staticserver.jl")
+        include("utils/template.jl")
+    end
+end

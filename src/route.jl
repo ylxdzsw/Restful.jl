@@ -60,7 +60,7 @@ function parserequest(req::Request)
         :headers => req.headers,
         :body    => req.data,
         :path    => uri.path   |> splitpath,
-        :query   => uri.query  |> parsequerystring # this should be moved out of Rest.jl. Maybe add a mixin system?
+        :query   => uri.query  |> parsequerystring # this should be a mixin since it is not involved in routing
     )
 end
 
