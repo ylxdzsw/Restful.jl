@@ -1,21 +1,12 @@
 module Restful
     using HTTP
+    using JSON2
 
-    export Utils
+    export app, json
 
-    include("constants.jl")
-    include("RestMethod.jl")
-    include("Resource.jl")
-    include("Mixin.jl")
+    const METHODS = [:GET, :POST, :PUT, :PATCH, :DELETE, :COPY, :HEAD, :OPTIONS]
+
+    include("req.jl")
     include("route.jl")
-    include("macros.jl")
-
-    module Utils
-        using ..Restful
-
-        include("utils/hooks.jl")
-        include("utils/mixins.jl")
-        include("utils/staticserver.jl")
-        include("utils/template.jl")
-    end
+    include("app.jl")
 end

@@ -1,60 +1,55 @@
-exit(0)
 using Restful
-using HttpServer
 using Test
 
-import JSON
-import Requests: get, post, put, delete, options, statuscode, headers
-import Restful.json
+import Restful: json
 
-_TODOLIST = Dict()
+const db = Dict()
 
-@resource todolist begin
-    :mixin => [defaultmixin]
+const app = Restful.app()
 
-    :GET | json => begin
-        _TODOLIST |> keys |> collect
-    end
+app.route("/") do req
+    "Hello World?"
+end
 
-    :POST | json => begin
-        id = req[:body] |> hash |> string
-        _TODOLIST[id] = req[:body]
-        Dict(:id=>id)
+app.get("/todo", json) do req
+    keys(db) |> collect
+end
+
+app.post("/todo", json) do req
+    id = req.body |> hash |> string
+    db[id] = req.body
+    (id=id,)
+end
+
+app.get("/todo/:id", json) do req, id
+    if id in keys(db)
+        (content=db[id],)
+    else
+        404
     end
 end
 
-@resource todoitem <: todolist begin
-    :route => "*"
-    :mixin => [defaultmixin]
+app.put("/todo/:id", json) do req, id
+    db[id] = req.body["content"]
+    200
+end
 
-    "get a todoitem content"
-    :GET | json => begin
-        if haskey(_TODOLIST, id)
-            Dict(:content=>_TODOLIST[id])
-        else
-            404
-        end
-    end
-
-    "add a todoitem with specific id"
-    :PUT | json => begin
-        _TODOLIST[id] = req[:body]["content"]
+app.delete("/todo/:id", json) do req, id
+    if id in keys(db)
+        delete!(db, id)
         200
-    end
-
-    :DELETE => begin
-        if haskey(_TODOLIST, id)
-            delete!(_TODOLIST, id)
-            200
-        else
-            404
-        end
+    else
+        404
     end
 end
 
-@async run(Server(todolist), host=ip"127.0.0.1", port=8000)
+@async app.listen(ip"127.0.0.1", 3001)
 
-url(x) = "http://127.0.0.1:8000$x"
+isinteractive() || wait()
+
+
+"""
+url(x) = "http://127.0.0.1:3001$x"
 
 @test read(get(url("/")), String) == "[]"
 @test statuscode(put(url("/10086"), json=Dict(:content=>"eat apple"))) == 200
@@ -67,3 +62,4 @@ url(x) = "http://127.0.0.1:8000$x"
       JSON.parse(read(get(url("/")), String))[1]
 @test statuscode(put(url("/"))) == 405
 @test headers(put(url("/")))["Allow"] == "GET, POST"
+"""
