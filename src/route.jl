@@ -1,35 +1,65 @@
 struct RouteNode
-    name::Union{String, Nothing}
-    handler::Dict{String, Function}
-    hook::Vector{Function}
+    name::String
+    hook::Dict{String, Vector{Function}}
     children::Vector{RouteNode}
 end
 
-RouteNode(name=nothing) = RouteNode(name, Dict{String, Function}(), Funciton[], RouteNode[])
+RouteNode(name) = RouteNode(name, [x => Function[] for x in [map(uppercase∘string, methods), "HOOK"]], RouteNode[])
 
-function find_node(seg)::RouteNode
-    magic()
+function find_node(node, seg, i=1)::RouteNode
+    i > length(seg) && return node
+    token = seg[i]
+    child = findfirst(x->startswith(x.name, ':') || x.name == token, node.children)
+    if child == nothing
+        push!(node.children, RouteNode(token))
+        child = length(node.children)
+    end
+    find_node(node.children[child], seg, i+1)
 end
 
-function (node::RouteNode)(path, req, res)
+function (node::RouteNode)(req, res)
+    seg, route = HTTP.URIs.splitpath(req.uri.path), PDict(:node=>node)
 
+    function _continue_route(node, k)
+        if k > length(seg)
+            method = req.method
+            method ∉ node.hook && return res.route_status = 405
+            _continue_handle(node.hook[method], 1)
+        end
+
+        token = seg[k]
+        child = findfirst(x->startswith(x.name, ':') || x.name == token, node.children)
+        if child == nothing
+            return res.route_status = 404
+        end
+        node = node.children[child]
+        route.node = node
+        startswith(node.name, ':') && setproperty!(route, Symbol(SubString(node.name, 2)), token)
+        return _continue_hook(node, node.hook["HOOK"], 1, k+1)
+    end
+
+    function _continue_hook(node, hooks, i, k)
+        i > length(hooks) && return _continue_route(node, k)
+        route.next = () -> _continue_hook(node, hooks, i+1, k)
+        hooks[i](req, res, route)
+    end
+
+    function _continue_handle(handlers, i)
+        i > length(handlers) && return # finished
+        route.next = () -> _continue_handle(handlers, i+1)
+        handlers[i](req, res, route)
+    end
+
+    _continue_hook(node, node.hook["HOOK"], 1, 1)
 end
 
 function build_routing_tree(rules)
     root = RouteNode("")
 
     for rule in rules
-        method, url, handler = rule
-        node = find_node(split(url, '/'))
-
-        if method == "HOOK"
-            push!(node.hook, handler)
-        else
-            method in node.handler && @warn "replace handler for $method:$url"
-            node.handler[method] = handler
-        end
-
-        push!(node.hook, rule[4:end]...)
+        method, path = rule
+        node = find_node(HTTP.URIs.splitpath(path))
+        push!(node.hook[method], rule[3:end]...)
     end
 
     root

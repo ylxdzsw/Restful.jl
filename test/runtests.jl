@@ -7,39 +7,35 @@ const db = Dict()
 
 const app = Restful.app()
 
-app.route("/") do req
-    "Hello World?"
+app.route("/") do req, res, route
+    res.text("Hello World?")
 end
 
-app.get("/todo", json) do req
-    keys(db) |> collect
+app.get("/todo", json) do req, res, route
+    res.json(keys(db) |> collect)
 end
 
-app.post("/todo", json) do req
+app.post("/todo", json) do req, res, route
     id = req.body |> hash |> string
     db[id] = req.body
-    (id=id,)
+    res.json(;id=id)
 end
 
-app.get("/todo/:id", json) do req, id
-    if id in keys(db)
-        (content=db[id],)
+app.get("/todo/:id", json) do req, res, route
+    route.id in keys(db) ? res.json(;content=db[route.id]) : res.code(404)
+end
+
+app.put("/todo/:id", json) do req, res, route
+    db[route.id] = req.body["content"]
+    res.code(200)
+end
+
+app.delete("/todo/:id", json) do req, res, route
+    if route.id in keys(db)
+        delete!(db, route.id)
+        res.code(200)
     else
-        404
-    end
-end
-
-app.put("/todo/:id", json) do req, id
-    db[id] = req.body["content"]
-    200
-end
-
-app.delete("/todo/:id", json) do req, id
-    if id in keys(db)
-        delete!(db, id)
-        200
-    else
-        404
+        res.code(404)
     end
 end
 

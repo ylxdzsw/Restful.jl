@@ -15,7 +15,8 @@ module PDicts
         proto = getfield(d, :proto)
         field in keys(proto) && return proto[field](d)
 
-        throw(KeyError(field))
+        # throw(KeyError(field))
+        nothing
     end
 
     function setproperty!(d::PDict, field::Symbol, value)
@@ -42,5 +43,7 @@ using .PDicts
 using .Headers
 
 function context(http::HTTP.Stream)
-    PDict(:_http=>http, :method=>http.message.method, :url=>http.message.target, :header=>Header(http.message.headers)), PDict()
+    uri = HTTP.URIs.parse_uri(http.message.target)
+    header = Header(http.message.headers)
+    PDict(:_http=>http, :method=>http.message.method, :uri=>uri, :header=>header), PDict()
 end
