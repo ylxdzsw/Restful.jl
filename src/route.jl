@@ -4,7 +4,7 @@ struct RouteNode
     children::Vector{RouteNode}
 end
 
-RouteNode(name) = RouteNode(name, [x => Function[] for x in [map(uppercase∘string, methods), "HOOK"]], RouteNode[])
+RouteNode(name) = RouteNode(name, Dict(x => Function[] for x in [map(uppercase∘string, methods); "HOOK"]), RouteNode[])
 
 function find_node(node, seg, i=1)::RouteNode
     i > length(seg) && return node
@@ -23,8 +23,8 @@ function (node::RouteNode)(req, res)
     function _continue_route(node, k)
         if k > length(seg)
             method = req.method
-            method ∉ node.hook && return res.route_status = 405
-            _continue_handle(node.hook[method], 1)
+            isempty(node.hook[method]) && return res.route_status = 405
+            return _continue_handle(node.hook[method], 1)
         end
 
         token = seg[k]
@@ -45,7 +45,7 @@ function (node::RouteNode)(req, res)
     end
 
     function _continue_handle(handlers, i)
-        i > length(handlers) && return # finished
+        i > length(handlers) && return @warn "the last handler calls `next`" path='/'*join(seg, '/')
         route.next = () -> _continue_handle(handlers, i+1)
         handlers[i](req, res, route)
     end
@@ -55,10 +55,11 @@ end
 
 function build_routing_tree(rules)
     root = RouteNode("")
+    push!(root.hook["HOOK"], default) # attach the default hook, which is a part of the basic Restful functionality
 
     for rule in rules
         method, path = rule
-        node = find_node(HTTP.URIs.splitpath(path))
+        node = find_node(root, HTTP.URIs.splitpath(path))
         push!(node.hook[method], rule[3:end]...)
     end
 
