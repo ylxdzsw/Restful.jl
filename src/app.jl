@@ -35,7 +35,7 @@ function context(http::HTTP.Stream)
 end
 
 function app()
-    routing_rules = []
+    routing_rules, server = [], nothing
 
     function _add_handler(method)
         function handle(f::Function, path, fs...)
@@ -49,8 +49,9 @@ function app()
 
     function _listen(address="127.0.0.1", port=3001)
         routing_tree = build_routing_tree(routing_rules)
+        server = Ref{Base.IOServer}()
 
-        HTTP.listen(address, port) do http::HTTP.Stream
+        HTTP.listen(address, port, tcpref=server) do http::HTTP.Stream
             req, res = context(http)
             routing_tree(req, res)
             HTTP.setstatus(http, res.status)
@@ -65,6 +66,7 @@ function app()
     (
         route = _add_handler("HOOK"),
         [method => _add_handler(uppercase(string(method))) for method in methods]...,
-        listen = _listen
+        listen = _listen,
+        close = () -> server != nothing && close(server[])
     )
 end

@@ -1,6 +1,5 @@
 module Restful
     using HTTP
-    export app, json
 
     const methods = [:get, :post, :put, :patch, :delete, :head, :options]
 
