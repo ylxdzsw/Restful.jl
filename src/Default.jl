@@ -1,4 +1,5 @@
 module Default
+    using HTTP
     export default
 
     function default(req, res, route)
@@ -18,6 +19,8 @@ module Default
             this.body = x
             this.content_type = "text/html"
         end
+
+        req[:params] = this -> this.params = HTTP.URIs.queryparams(this.uri)
 
         req.body = read(req._http, String)
         route.next()
