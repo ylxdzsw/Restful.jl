@@ -2,6 +2,7 @@ using Restful
 using Test
 using HTTP
 using JSON2
+using Logging
 
 import Restful: json
 
@@ -40,7 +41,9 @@ app.delete("/todo/:id", json) do req, res, route
     end
 end
 
-@async app.listen("127.0.0.1", 3001)
+@async with_logger(SimpleLogger(stderr, Logging.Warn)) do
+    app.listen("127.0.0.1", 3001)
+end
 
 macro u_str(x)
     "http://127.0.0.1:3001$x"
