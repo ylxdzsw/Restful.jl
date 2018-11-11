@@ -11,4 +11,7 @@ module Restful
 
     include("Json.jl")
     using .Json
+
+    include("Template.jl")
+    using .Template
 end

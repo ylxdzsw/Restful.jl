@@ -1,3 +1,6 @@
+# TODO: make it type-stable?
+# type parameters can be (nested) Symbol, Tuple, Function, and NametedTuple
+# so we can embed all hooks and req prototypes into the type parameter
 struct RouteNode
     name::String
     hook::Dict{String, Vector{Function}}
