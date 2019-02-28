@@ -1,4 +1,5 @@
 import Base: getproperty, setproperty!, setindex!
+import Sockets
 
 struct PDict
     dict::Dict{Symbol, Any}
@@ -47,11 +48,11 @@ function app()
         handle
     end
 
-    function _listen(address="127.0.0.1", port=3001)
+    function _listen(address=ip"127.0.0.1", port=3001)
         routing_tree = build_routing_tree(routing_rules)
-        server = Ref{Base.IOServer}()
+        server = Sockets.listen(address, port)
 
-        HTTP.listen(address, port, tcpref=server) do http::HTTP.Stream
+        HTTP.listen(address, port, server=server) do http::HTTP.Stream
             req, res = context(http)
             routing_tree(req, res)
             HTTP.setstatus(http, res.status)
@@ -67,6 +68,6 @@ function app()
         route = _add_handler("HOOK"),
         [method => _add_handler(uppercase(string(method))) for method in methods]...,
         listen = _listen,
-        close = () -> server != nothing && close(server[])
+        close = () -> server != nothing && close(server)
     )
 end
