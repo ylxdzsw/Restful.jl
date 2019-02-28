@@ -48,9 +48,9 @@ function app()
         handle
     end
 
-    function _listen(address=ip"127.0.0.1", port=3001)
+    function _listen(address="127.0.0.1", port=3001)
         routing_tree = build_routing_tree(routing_rules)
-        server = Sockets.listen(address, port)
+        server = Sockets.listen(parse(Sockets.IPAddr, address), port)
 
         HTTP.listen(address, port, server=server) do http::HTTP.Stream
             req, res = context(http)
